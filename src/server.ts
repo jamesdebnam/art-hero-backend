@@ -15,10 +15,10 @@ app.post('/masterpiece', async (req: Request, res: Response) => {
   try {
     // The request body is expected to be a JSON object
     const data: any = req.body;
-    
+
     // Create the masterpiece in the database
     const result = await dbOperations.createMasterpiece(data);
-    
+
     // Return the created masterpiece with status 201 (Created)
     res.status(201).json(result);
   } catch (error) {
@@ -31,7 +31,7 @@ app.post('/masterpiece', async (req: Request, res: Response) => {
 app.get('/masterpiece', async (_req: Request, res: Response) => {
   try {
     const masterpieces = await dbOperations.getAllMasterpieces();
-    
+
     res.json(masterpieces);
   } catch (error) {
     console.error('Error retrieving masterpieces:', error);
@@ -43,17 +43,37 @@ app.get('/masterpiece', async (_req: Request, res: Response) => {
 app.get('/masterpiece/:id', async (req: Request, res: Response) => {
   try {
     const id: string = req.params.id;
-    
+
     const masterpiece = await dbOperations.getMasterpieceById(id);
-    
+
     res.json(masterpiece);
   } catch (error: any) {
     console.error('Error retrieving masterpiece:', error);
-    
+
     if (error.message === 'Masterpiece not found') {
       res.status(404).json({ error: 'Masterpiece not found' });
     } else {
       res.status(500).json({ error: 'Failed to retrieve masterpiece' });
+    }
+  }
+});
+
+// PATCH /masterpiece/:id - Update a specific masterpiece by ID
+app.patch('/masterpiece/:id', async (req: Request, res: Response) => {
+  try {
+    const id: string = req.params.id;
+    const data: any = req.body;
+
+    const updatedMasterpiece = await dbOperations.updateMasterpiece(id, data);
+
+    res.json(updatedMasterpiece);
+  } catch (error: any) {
+    console.error('Error updating masterpiece:', error);
+
+    if (error.message === 'Masterpiece not found') {
+      res.status(404).json({ error: 'Masterpiece not found' });
+    } else {
+      res.status(500).json({ error: 'Failed to update masterpiece' });
     }
   }
 });

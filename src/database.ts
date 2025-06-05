@@ -15,7 +15,7 @@ const db: sqlite3.Database = new sqlite3.Database(dbPath, (err: Error | null) =>
     console.error('Error connecting to database:', err.message);
   } else {
     console.log('Connected to the masterpieces database.');
-    
+
     // Create the masterpieces table if it doesn't exist
     db.run(`
       CREATE TABLE IF NOT EXISTS masterpieces (
@@ -81,6 +81,30 @@ const dbOperations = {
             id: row.id,
             data: JSON.parse(row.data),
             created_at: row.created_at
+          });
+        }
+      });
+    });
+  },
+
+  // Update a masterpiece by ID
+  updateMasterpiece: (id: number | string, data: any): Promise<{status:'success'}> => {
+    return new Promise((resolve, reject) => {
+      // First check if the masterpiece exists
+      db.get('SELECT id FROM masterpieces WHERE id = ?', [id], (err: Error | null, row: any) => {
+        if (err) {
+          reject(err);
+        } else if (!row) {
+          reject(new Error('Masterpiece not found'));
+        } else {
+          // Masterpiece exists, proceed with update
+          const jsonData: string = JSON.stringify(data);
+          db.run('UPDATE masterpieces SET data = ? WHERE id = ?', [jsonData, id], (err: Error | null) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({ status: 'success'});
+            }
           });
         }
       });
