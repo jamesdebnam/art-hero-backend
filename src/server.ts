@@ -1,12 +1,18 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import dbOperations from './database';
 
 // Initialize Express app
 const app: express.Application = express();
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 
-// Middleware
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(bodyParser.json());
 
 // Routes
